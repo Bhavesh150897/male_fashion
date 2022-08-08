@@ -93,3 +93,17 @@ $('body').on('click','.shop-add-to-fav',function (argument) {
         },
     });
 })
+
+// $(document).ready(function () {
+//     var path = url;
+//     $('#search').typeahead({
+//             source: function (query, process) {
+//                 return $.get(path, {
+//                     query: query
+//                 }, function (data) {
+//                     console.log(data);
+//                     return process(data);
+//                 });
+//             }
+//         });
+// });

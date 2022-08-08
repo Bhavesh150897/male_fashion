@@ -95,11 +95,13 @@
                                 {% if user.is_authenticated  %}
                                     {% if item_already_in_cart  %}
                                      <a href="{% url 'cart' %}" class="primary-btn add-to-cart">Go to Cart</a>
+                                     <a id="checkout-button" class="primary-btn buy-now">Buy Now</a>
                                     {% else %}
                                      <form action="{% url 'add-to-cart' %}" class="d-inline">
                                       <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
                                       <button type="submit" class="primary-btn add-to-cart">Add to Cart</button>
                                      </form>
+                                      <a id="checkout-button" class="primary-btn buy-now">Buy Now</a>
                                     {% endif %}
                                    {% endif %}
 
@@ -108,6 +110,7 @@
                                       <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
                                       <button type="submit" class="primary-btn add-to-cart">Add to Cart</button>
                                      </form>
+                                      <a id="checkout-button" class="primary-btnbuy-now">Buy Now</a>
                                    {% endif %}
                             </div>
                             <div class="product__details__btns__option">
@@ -182,5 +185,4 @@
             </div>
         </div>
     </section>
-    <!-- Related Section End -->
 {% endblock content %}

@@ -27,8 +27,8 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("profile/", views.CustomerView.as_view(), name="userProfile"),
     path("address/", views.address, name="address"),
-    # path('product/checkout/<id>/', views.create_checkout_session, name='product_checkout'),
-
+    path("results/", views.SearchView.as_view(), name="search"),
+    
     path('passwordchange/', auth_views.PasswordChangeView.as_view(template_name='fashion/passwordchange.html', form_class=MyPasswordChangeForm, success_url='/passwordchangedone/'), name='passwordchange'),
     path('passwordchangedone/', auth_views.PasswordChangeDoneView.as_view(template_name='fashion/passwordchangedone.html'), name='passwordchangedone'),
 

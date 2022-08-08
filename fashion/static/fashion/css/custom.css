@@ -39,3 +39,7 @@
 .remove-cart{
     cursor: pointer !important;   
 }
+.buy-now{
+    color: white !important;
+    cursor: pointer !important;
+}

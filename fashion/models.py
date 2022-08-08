@@ -105,6 +105,9 @@ class OrderPlaced(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     ordered_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50,choices=STATUS_CHOICES,default='Pending')
+    amount = models.IntegerField(verbose_name='Amount')
+    stripe_payment_intent = models.CharField(max_length=200)
+    has_paid = models.BooleanField(default=False,verbose_name='Payment Status')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

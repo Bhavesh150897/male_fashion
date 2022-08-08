@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django import template
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -14,14 +14,15 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password, check_password
 from .forms import RegisterForm, LoginForm, CustomerProfileForm
 from django.views import View
-from .models import Slider, Product,Catagory, Cart, FavouriteProduct, Customer
+from .models import Slider, Product,Catagory, Cart, FavouriteProduct, Customer, OrderPlaced
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import RedirectView,TemplateView
 from django.conf import settings
-# from django.views.decorators.csrf import csrf_exempt
-# import json
-# import stripe
+from django.views.decorators.csrf import csrf_exempt
+import json
+import stripe
+from django.views.generic import ListView
 
 # Create your views here.
 
@@ -222,7 +223,7 @@ class productDetails(View):
         if request.user.is_authenticated:
             totalitem = len(Cart.objects.filter(user=request.user))
             item_already_in_cart = Cart.objects.filter(Q(product=product.id) & Q(user=request.user)).exists()
-        return render(request, 'fashion/proDetails.html', {'product':product,'totalitem':totalitem,'product_in_favorites':product_in_favorites,'item_already_in_cart':item_already_in_cart,'products':products})
+        return render(request, 'fashion/proDetails.html', {'product':product,'totalitem':totalitem,'product_in_favorites':product_in_favorites,'item_already_in_cart':item_already_in_cart,'products':products,'stripe_publishable_key':settings.STRIPE_PUBLISHABLE_KEY,'email':request.user.email})
 
 class CustomerView(View):
     def get(self, request):
@@ -293,3 +294,13 @@ def login(request):
                 messages.warning(request, 'Oops! something went wrong!')
         return render(request, "fashion/login.html", {"form": form})
     return redirect("")
+
+class SearchView(ListView):
+    model = Product
+    template_name = 'fashion/search.html'
+    context_object_name = 'all_search_results'
+
+    def get_queryset(self):
+        query = self.request.GET.get('search','')
+        products=Product.objects.filter(Q(name__icontains=query))
+        return products
