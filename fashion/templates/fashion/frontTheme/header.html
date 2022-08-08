@@ -1,0 +1,73 @@
+{% load static %}
+{% url 'home' as home_url %}
+{% url 'about' as about %}
+{% url 'shop' as shop %}
+{% url 'contact' as contact %}
+<!-- Header Section Begin -->
+<header class="header">
+    <div class="header__top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-7">
+                    <div class="header__top__left">
+                        <p>Free shipping, 30-day return or refund guarantee.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-5">
+                    <div class="header__top__right">
+                        <div class="header__top__links">
+                            <nav class="header__menu mobile-menu user-profile p-0">
+                                <ul>
+                                    {% if user.is_authenticated %}
+                                        <li class="active"><a href="{% url 'home' %}">{{ user.get_username }}</a>
+                                            <ul class="dropdown">
+                                                <li class=""><a href="{% url 'userProfile' %}">My Profile</a></li>
+                                                <li class=""><a href="{% url 'passwordchange' %}">Change Password</a></li>
+                                                <li class=""><a href="{% url 'logout' %}">Logout</a></li>
+                                            </ul>
+                                        </li>
+                                    {% else %}
+                                        <a href="{% url 'login' %}">Sign In</a>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-3">
+                <div class="header__logo">
+                    <a href="{% url 'home' %}"><img src="{% static 'fashion/img/logo.png' %}" alt=""></a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <nav class="header__menu mobile-menu">
+                    <ul>
+                        <li class="{% if request.path == home_url %} active {%endif%}"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="{% if request.path == shop %} active {%endif%}"><a href="{% url 'shop' %}">Shop</a></li>
+                        <li class="{% if request.path == about %} active {%endif%}"><a href="{% url 'home' %}">Pages</a>
+                            <ul class="dropdown">
+                                <li class=""><a href="{% url 'about' %}">About Us</a></li>
+                            </ul>
+                        </li>
+                        <li class="{% if request.path == contact %} active {%endif%}"><a href="{% url 'contact' %}">Contacts</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <div class="header__nav__option">
+                    <a href="#" class="search-switch"><img src="{% static 'fashion/img/icon/search.png' %}" alt=""></a>
+                    <a href="{% url 'favoritesPage' %}"><img src="{% static 'fashion/img/icon/heart.png' %}" alt=""></a>
+                    <a href="{% url 'cart' %}"><img src="{% static 'fashion/img/icon/cart.png' %}" alt=""> <span>{{ totalitem }}</span></a>
+                    <div class="price">${{ totalamount }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="canvas__open"><i class="fa fa-bars"></i></div>
+    </div>
+</header>
+<!-- Header Section End -->

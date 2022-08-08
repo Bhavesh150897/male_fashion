@@ -1,0 +1,17 @@
+{% extends 'fashion/base.html' %}
+{% load static %}
+<!-- Hero Section Begin -->
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-12 pb-5">
+            <h3 class="text-center">You have no Product in Your Cart</h3>
+        </div>
+        <div class="col-lg-12">
+            <div class="text-center">
+                <img src="{% static 'fashion/img/emptycart.png' %}" alt="">
+            </div>
+        </div>
+    </div>
+ </div>
+{% endblock content %}

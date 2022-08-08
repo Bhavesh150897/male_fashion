@@ -1,0 +1,41 @@
+.login{
+    font-size: 60px;
+    font-weight: bold;
+}
+.login-spad{
+    padding-top: 70px !important;
+    padding-bottom: 200px !important;
+}
+.forgot-link{
+    color: #111111 !important;
+    text-decoration: none !important;
+}
+.add-to-cart{
+    color: #fff !important;
+    text-decoration: none !important;
+}
+.forgot-link:hover{
+    color: none !important;
+}
+.auth-page input{
+    margin-bottom: 0px !important;
+}
+.user-profile ul li a{
+    color: #ffffff !important;
+}
+.user-profile ul li .dropdown{
+    width: 184px !important;
+}
+.fill-color{
+    color: red !important;
+}
+.add-favourite{
+    cursor: pointer !important;
+}
+.nav-pills .nav-link.active{
+    background-color: #111111 !important;
+    color: white !important;
+}
+.remove-cart{
+    cursor: pointer !important;   
+}

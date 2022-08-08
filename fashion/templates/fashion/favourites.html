@@ -1,0 +1,60 @@
+{% extends 'fashion/base.html' %}
+{% load static %}
+<!-- Hero Section Begin -->
+{% block content %}
+<!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Shop</h4>
+                        <div class="breadcrumb__links">
+                            <a href="{% url 'home' %}">Home</a>
+                            <span>Shop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        {% if product_list %}
+                            {% for product in product_list %}
+                                <div class="col-lg-4 col-md-6 col-sm-6">
+                                    <div class="product__item sale">
+                                        <div class="product__item__pic set-bg" data-setbg="{{product.product_image.url}}">
+                                            <span class="label">{{ product.label }}</span>
+                                            <ul class="product__hover">
+                                                <li>
+                                                    <a data-id={{product.id}} class=""><i class="fa fa-heart" aria-hidden="true"></i></a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="product__item__text">
+                                            <h6 class="pb-2"><small>{{ product.brand.name }}</small></h6>
+                                            <h6><a href="{% url 'productDetails' product.id %}" class="forgot-link">{{ product.name }}</a></h6>
+                                            <h5 class="pt-2">${{ product.original_price }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-md-12 text-center">
+                                <strong>There are no favourite product..</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shop Section End -->
+{% endblock content %}

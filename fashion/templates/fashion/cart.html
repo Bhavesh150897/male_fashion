@@ -1,0 +1,106 @@
+{% extends 'fashion/base.html' %}
+{% load static %}
+<!-- Hero Section Begin -->
+{% block content %}
+<!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Shopping Cart</h4>
+                        <div class="breadcrumb__links">
+                            <a href="{% url 'home' %}">Home</a>
+                            <a href="{% url 'shop' %}">Shop</a>
+                            <span>Shopping Cart</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shopping Cart Section Begin -->
+    <section class="shopping-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="shopping__cart__table">
+                        <table class="cart-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if carts %}
+                                    {% for cart in carts %}
+                                        <tr class="main-tr-{{ cart.product.id }}">
+                                            <td class="product__cart__item">
+                                                <div class="product__cart__item__pic">
+                                                    <img src="{{ cart.product.product_image.url }}" alt="{{ cart.product.product_image.url }}" height="90" width="90">
+                                                </div>
+                                                <div class="product__cart__item__text">
+                                                    <h6>{{ cart.product.name }}</h6>
+                                                    <h5>${{ cart.product.original_price }}</h5>
+                                                </div>
+                                            </td>
+                                            <td class="quantity__item">
+                                                <div class="quantity">
+                                                    <div class="pro-qty-2">
+                                                        <a class="forgot-link minus-cart" pid="{{cart.product.id}}"><i class="fa fa-angle-left dec"></i></a>
+                                                        <input type="text" class="quantity-val-{{ cart.product.id }}" value="{{cart.quantity}}">
+                                                        <a class="forgot-link plus-cart" pid="{{cart.product.id}}"><i class="fa fa-angle-right inc"></i></a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="cart__price">${{ cart.product.original_price }}</td>
+                                            <td class="cart__close"><a class="remove-cart" pid={{cart.product.id}}><i class="fa fa-close"></i></a></td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                       <td colspan="3">There are no product!</td>     
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn">
+                                <a href='{% url "home" %}'>Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <!-- <div class="cart__discount">
+                        <h6>Discount codes</h6>
+                        <form action="#">
+                            <input type="text" placeholder="Coupon code">
+                            <button type="submit">Apply</button>
+                        </form>
+                    </div> -->
+                    <div class="cart__total">
+                        <h6>Cart total</h6>
+                        <ul>
+                            <li>Subtotal <span id="amount">$ {{amount|floatformat:2}}</span></li>
+                            <li class="shipping">Shipping <span>$ 70.00</span></li>
+
+                            <hr>
+                            <li>Total <span id="totalamount">$ {{totalamount|floatformat:2}}</span></li>
+                        </ul>
+                        <hr>
+                        <a href="{% url 'checkout' %}" class="primary-btn">Proceed to checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Shopping Cart Section End -->
+{% endblock content %}

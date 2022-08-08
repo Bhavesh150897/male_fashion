@@ -1,0 +1,26 @@
+[
+  {
+    "model": "core.HotCollection",
+    "pk": 1,
+    "fields": {
+      "first_name": "John",
+      "last_name": "Snow"
+    }
+  },
+  {
+    "model": "core.HotCollection",
+    "pk": 2,
+    "fields": {
+      "first_name": "Paul",
+      "last_name": "McCartney"
+    }
+  },
+  {
+    "model": "core.HotCollection",
+    "pk": 3,
+    "fields": {
+      "first_name": "Paul",
+      "last_name": "McCartney"
+    }
+  }
+]
