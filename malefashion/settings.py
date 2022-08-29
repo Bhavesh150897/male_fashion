@@ -53,6 +53,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+MIDDLEWARE_CLASSES = [
+    'fashion.middleware.AutoLogout', 
+]
+
 ROOT_URLCONF = 'malefashion.urls'
 
 TEMPLATES = [
@@ -155,3 +159,17 @@ if DEBUG:
 # else:
 #     STRIPE_PUBLISHABLE_KEY = 'production_publishable_key'
 #     STRIPE_SECRET_KEY = 'production_secret_key'
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# SESSION_COOKIE_AGE = 5 * 60
+
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
+# Auto logout delay in minutes
+AUTO_LOGOUT_DELAY = 5 #equivalent to 5 minutes
+
+RAZORPAY_KEY_ID = 'rzp_test_mWcxMOaFbrS2ux'
+RAZORPAY_KEY_SECRET = 'wIe0uzjFBpK23F52MT79y0Sf'
+
+# RAZORPAY_KEY_ID = "rzp_test_pw9gzzwaOSMUxs"
+# RAZORPAY_KEY_SECRET = "mD5BJXhjOyvkUaAgQg4IUL6D"

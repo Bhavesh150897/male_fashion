@@ -28,7 +28,7 @@
                     <div class="shop__sidebar">
                         <div class="shop__sidebar__search">
                             <form action="{% url 'search' %}" method="GET">
-                                <input type="text" name="search" class="typeahead" placeholder="Search..." id="search">
+                                <input type="text" class="typeahead" name="search" placeholder="Search..." id="search">
                                 <button type="submit"><span class="icon_search"></span></button>
                             </form>
                         </div>
@@ -47,13 +47,7 @@
                                                             <li><a href="{% url 'product_cat' catagory.slug %}">{{ catagory.name }} ({{ catagory.product_set.count }})</a></li>    
                                                         {% endfor %}
                                                     {% else %}
-                                                        <li><a href="#">Men</a></li>
-                                                        <li><a href="#">Women</a></li>
-                                                        <li><a href="#">Bags</a></li>
-                                                        <li><a href="#">Clothing</a></li>
-                                                        <li><a href="#">Shoes</a></li>
-                                                        <li><a href="#">Accessories</a></li>
-                                                        <li><a href="#">Kids</a></li>
+                                                        There are no product category..
                                                     {% endif %}
                                                 </ul>
                                             </div>
@@ -66,14 +60,12 @@
                                     </div>
                                     <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
                                         <div class="card-body">
-                                            <div class="shop__sidebar__price">
+                                            <div class="shop__sidebar__price contact__form filter__form">
                                                 <ul>
-                                                    <li><a href="#">$0.00 - $50.00</a></li>
-                                                    <li><a href="#">$50.00 - $100.00</a></li>
-                                                    <li><a href="#">$100.00 - $150.00</a></li>
-                                                    <li><a href="#">$150.00 - $200.00</a></li>
-                                                    <li><a href="#">$200.00 - $250.00</a></li>
-                                                    <li><a href="#">250.00+</a></li>
+                                                    <input type="range" value="{{minMaxPrice.original_price__min}}" max="{{minMaxPrice.original_price__max}}" min="{{minMaxPrice.original_price__min}}" id="rangeInput" oninput="maxPrice.value=this.value" />
+                                                    <p>{{minMaxPrice.original_price__min}}-{{minMaxPrice.original_price__max}}</p>
+                                                    Max: <input type="number" value="{{minMaxPrice.original_price__min}}" max={{minMaxPrice.original_price__max}} min={{minMaxPrice.original_price__min}} id="maxPrice" onkeyup="rangeInput.value=this.value" id="maxPrice" />
+                                                    <button id="priceFilterBtn" class="primary-btn filter-btn mt-1">Filter</button>
                                                 </ul>
                                             </div>
                                         </div>
@@ -116,6 +108,24 @@
                                 </div>
                                 <div class="card">
                                     <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSeven">Brand</a>
+                                    </div>
+                                    <div id="collapseSeven" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                {% if brands %}
+                                                    {% for brand in brands %}
+                                                        <a href="{% url 'brand_cat' brand.slug %}">{{ brand.name }}</a>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    There are no any brands..
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
                                     </div>
                                     <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
@@ -141,26 +151,26 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 126 results</p>
+                                    <p>Showing 1–{{ productCount }} of {{ productCount }} results</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
-                                    <form method="GET" action="{% url 'search' %}" class="sort-search-form">
+                                    <form method="GET" action="{% url 'shop' %}" class="sort-form">
                                     <p>Sort by Price:</p>
-                                        <select class="search-filter" name="order_by">
-                                            <option value="" selected>Low To High</option>
-                                            <option value="highest">Highest Price</option>
+                                        <select class="low-to-high" name="order_by">
+                                            <option>Popularity</option>
                                             <option value="lowest">Lowest Price</option>
+                                            <option value="highest">Highest Price</option>
                                         </select>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        {% if product_list %}
-                            {% for product in product_list %}
+                    <div class="row" id="filteredProducts">
+                        {% if products %}
+                            {% for product in data %}
                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                     <div class="product__item sale">
                                         <div class="product__item__pic set-bg" data-setbg="{{product.product_image.url}}">
@@ -179,22 +189,18 @@
                                     </div>
                                 </div>
                             {% endfor %}
-                        {% else %}
-                            <div class="col-lg-12 text-center">
-                                <h5 style="">add something to show no results...</h5>
-                            </div>
                         {% endif %}
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
-                                {% for i in products.paginator.page_range %}
-                                    {% if products.number == i %}
-                                        <a class="active" href="?page={{ i }}">{{ i }}</a>
-                                    {% else %}
-                                        <a class="" href="?page={{ i }}">{{ i }}</a>
-                                    {% endif %}
-                                {% endfor %}
+                            {% for i in products.paginator.page_range %}
+                                {% if products.number == i %}
+                                    <a class="active" href="?page={{ i }}">{{ i }}</a>
+                                {% else %}
+                                    <a class="" href="?page={{ i }}">{{ i }}</a>
+                                {% endif %}
+                            {% endfor %}
                             </div>
                         </div>
                     </div>

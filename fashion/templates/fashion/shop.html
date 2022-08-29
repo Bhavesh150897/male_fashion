@@ -44,16 +44,10 @@
                                                 <ul class="nice-scroll">
                                                     {% if catagories %}
                                                         {% for catagory in catagories %}
-                                                            <li><a href="#">{{ catagory.name }} ({{ catagory.product_set.count }})</a></li>    
+                                                            <li><a href="{% url 'product_cat' catagory.slug %}">{{ catagory.name }} ({{ catagory.product_set.count }})</a></li>    
                                                         {% endfor %}
                                                     {% else %}
-                                                        <li><a href="#">Men</a></li>
-                                                        <li><a href="#">Women</a></li>
-                                                        <li><a href="#">Bags</a></li>
-                                                        <li><a href="#">Clothing</a></li>
-                                                        <li><a href="#">Shoes</a></li>
-                                                        <li><a href="#">Accessories</a></li>
-                                                        <li><a href="#">Kids</a></li>
+                                                        There are no product category..
                                                     {% endif %}
                                                 </ul>
                                             </div>
@@ -116,18 +110,36 @@
                                 </div>
                                 <div class="card">
                                     <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSeven">Brand</a>
+                                    </div>
+                                    <div id="collapseSeven" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                {% if brands %}
+                                                    {% for brand in brands %}
+                                                        <a href="{% url 'brand_cat' brand.slug %}">{{ brand.name }}</a>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    There are no any brands..
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
                                     </div>
                                     <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
                                         <div class="card-body">
                                             <div class="shop__sidebar__tags">
-                                                <a href="#">Product</a>
-                                                <a href="#">Bags</a>
-                                                <a href="#">Shoes</a>
-                                                <a href="#">Fashion</a>
-                                                <a href="#">Clothing</a>
-                                                <a href="#">Hats</a>
-                                                <a href="#">Accessories</a>
+                                                {% if catagories %}
+                                                    {% for catagory in catagories %}
+                                                        <a href="{% url 'product_cat' catagory.slug %}">{{ catagory.name }}</a>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    There are no product category..
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -141,17 +153,19 @@
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 126 results</p>
+                                    <p>Showing 1–{{ productCount }} of {{ productCount }} results</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
+                                    <form method="GET" action="{% url 'shop' %}" class="sort-form">
                                     <p>Sort by Price:</p>
-                                    <select>
-                                        <option value="">Low To High</option>
-                                        <option value="">$0 - $55</option>
-                                        <option value="">$55 - $100</option>
-                                    </select>
+                                        <select class="low-to-high" name="order_by">
+                                            <option>Popularity</option>
+                                            <option value="lowest">Lowest Price</option>
+                                            <option value="highest">Highest Price</option>
+                                        </select>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -182,11 +196,13 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
-                                <a class="active" href="#">1</a>
-                                <a href="#">2</a>
-                                <a href="#">3</a>
-                                <span>...</span>
-                                <a href="#">21</a>
+                            {% for i in products.paginator.page_range %}
+                                {% if products.number == i %}
+                                    <a class="active" href="?page={{ i }}">{{ i }}</a>
+                                {% else %}
+                                    <a class="" href="?page={{ i }}">{{ i }}</a>
+                                {% endif %}
+                            {% endfor %}
                             </div>
                         </div>
                     </div>

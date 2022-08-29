@@ -49,11 +49,7 @@
                     <ul>
                         <li class="{% if request.path == home_url %} active {%endif%}"><a href="{% url 'home' %}">Home</a></li>
                         <li class="{% if request.path == shop %} active {%endif%}"><a href="{% url 'shop' %}">Shop</a></li>
-                        <li class="{% if request.path == about %} active {%endif%}"><a href="{% url 'home' %}">Pages</a>
-                            <ul class="dropdown">
-                                <li class=""><a href="{% url 'about' %}">About Us</a></li>
-                            </ul>
-                        </li>
+                        <li class="{% if request.path == about %} active {%endif%}"><a href="{% url 'about' %}">About Us</a></li>
                         <li class="{% if request.path == contact %} active {%endif%}"><a href="{% url 'contact' %}">Contacts</a></li>
                     </ul>
                 </nav>

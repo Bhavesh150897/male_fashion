@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -13,6 +14,7 @@ class Slider(models.Model):
 
 class Catagory(models.Model):
     name = models.CharField(max_length=150,null=False,blank=False)
+    slug = models.CharField(max_length=150,null=False,blank=False)
     description = models.TextField(max_length=500,null=False,blank=False)
     status = models.BooleanField(default=False,help_text="0-show,1-Hidden")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -20,6 +22,10 @@ class Catagory(models.Model):
  
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 LABEL = (
     ('New', 'New'),
@@ -29,12 +35,34 @@ LABEL = (
 
 class Brand(models.Model):
     name = models.CharField(max_length=255)
+    slug = models.CharField(max_length=150,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+class Customer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=200)
+    last_name = models.CharField(max_length=200)
+    country = models.CharField(max_length=200)
+    address = models.TextField()
+    city = models.CharField(max_length=50)
+    zipcode = models.IntegerField()
+    state = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100)
+    phone = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self): 
+        return str(self.id)
+        
 class Product(models.Model):
     category = models.ForeignKey(Catagory,on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand,on_delete=models.CASCADE,default=1)
@@ -48,6 +76,7 @@ class Product(models.Model):
     long_desc = models.TextField(null=False,blank=False,default='')
     status = models.BooleanField(default=False,help_text="0-show,1-Hidden")
     trending = models.BooleanField(default=False,help_text="0-default,1-Trending")
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
  
@@ -73,23 +102,6 @@ class FavouriteProduct(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ManyToManyField(Product)
 
-class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=200)
-    last_name = models.CharField(max_length=200)
-    country = models.CharField(max_length=200)
-    address = models.TextField()
-    city = models.CharField(max_length=50)
-    zipcode = models.IntegerField()
-    state = models.CharField(max_length=50)
-    email = models.EmailField(max_length=100)
-    phone = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self): 
-        return str(self.id)
-
 STATUS_CHOICES = (
   ('Accepted','Accepted'),
   ('Packed','Packed'),
@@ -106,7 +118,8 @@ class OrderPlaced(models.Model):
     ordered_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50,choices=STATUS_CHOICES,default='Pending')
     amount = models.IntegerField(verbose_name='Amount')
-    stripe_payment_intent = models.CharField(max_length=200)
+    order_id = models.CharField(max_length=50)
+    razorpay_payment_id = models.CharField(max_length=200)
     has_paid = models.BooleanField(default=False,verbose_name='Payment Status')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -115,3 +128,26 @@ class OrderPlaced(models.Model):
     @property
     def total_cost(self):
         return self.quantity * self.product.original_price
+
+class Size(models.Model):
+    name = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.name)
+    
+class Color(models.Model):
+    name = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.name)
+
+class Variation(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variations")
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

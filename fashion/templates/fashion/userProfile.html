@@ -25,7 +25,7 @@
     <section class="checkout spad">
         <div class="container">
             <div class="checkout__form">
-                <p>Hello <strong class="text-capitalize">{{request.user}}</strong></p>
+                <p>Hello, <strong class="text-capitalize">{{request.user}}</strong></p>
                 <form method="POST" novalidate>
                     {% csrf_token %}
                     <div class="row">

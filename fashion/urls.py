@@ -27,7 +27,12 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("profile/", views.CustomerView.as_view(), name="userProfile"),
     path("address/", views.address, name="address"),
-    path("results/", views.SearchView.as_view(), name="search"),
+    path("results/", views.search, name="search"),
+    path('filter-data',views.filter_data,name='filter_data'),
+    path('payment-status', views.payment_status, name='payment-status'),
+    # path("price-sort/", views.low_to_high, name="low_to_high"),
+    path('cat/<slug:slug>', views.product_cat, name='product_cat'),
+    path('brand/<slug:slug>', views.brand_cat, name='brand_cat'),
     
     path('passwordchange/', auth_views.PasswordChangeView.as_view(template_name='fashion/passwordchange.html', form_class=MyPasswordChangeForm, success_url='/passwordchangedone/'), name='passwordchange'),
     path('passwordchangedone/', auth_views.PasswordChangeDoneView.as_view(template_name='fashion/passwordchangedone.html'), name='passwordchangedone'),

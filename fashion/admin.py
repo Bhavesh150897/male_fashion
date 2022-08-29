@@ -8,6 +8,18 @@ class SliderAdmin(admin.ModelAdmin):
     model = Slider
     list_display = ['name', 'description', ]
 
+class SizeAdmin(admin.ModelAdmin):
+    model = Size
+    list_display = ['name', ]
+
+class ColorAdmin(admin.ModelAdmin):
+    model = Color
+    list_display = ['name', ]
+
+class VariationAdmin(admin.ModelAdmin):
+    model = Variation
+    list_display = ['product', 'size', 'color', ]
+
 class ProductAdmin(SummernoteModelAdmin,admin.ModelAdmin):
     model = Product
     summernote_fields = 'long_desc'
@@ -19,9 +31,12 @@ class CatagoryAdmin(admin.ModelAdmin):
 
 class BrandAdmin(admin.ModelAdmin):
     model = Brand
-    list_display = ['name','created_at', ]
+    list_display = ['name','slug','created_at', ]
 
 admin.site.register(Slider,SliderAdmin)
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Catagory,CatagoryAdmin)
 admin.site.register(Brand,BrandAdmin)
+admin.site.register(Size,SizeAdmin)
+admin.site.register(Color,ColorAdmin)
+admin.site.register(Variation,VariationAdmin)

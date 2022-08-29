@@ -1,4 +1,4 @@
-{% extends 'fashion/base.html' %}
+<!-- {% extends 'fashion/base.html' %}
 {% load static %}
 <!-- Hero Section Begin -->
 {% block content %}
@@ -116,6 +116,24 @@
                                 </div>
                                 <div class="card">
                                     <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSeven">Brand</a>
+                                    </div>
+                                    <div id="collapseSeven" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                {% if brands %}
+                                                    {% for brand in brands %}
+                                                        <a href="{% url 'brand_cat' brand.slug %}">{{ brand.name }}</a>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    There are no any brands..
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
                                         <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
                                     </div>
                                     <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
@@ -146,9 +164,9 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
-                                    <form method="GET" action="{% url 'search' %}" class="sort-search-form">
+                                    <form method="GET" action="{% url 'brand_cat' slug %}" class="sort-brand-search-form">
                                     <p>Sort by Price:</p>
-                                        <select class="search-filter" name="order_by">
+                                        <select class="low-to-high-brand" name="order_by">
                                             <option value="" selected>Low To High</option>
                                             <option value="highest">Highest Price</option>
                                             <option value="lowest">Lowest Price</option>
@@ -159,8 +177,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        {% if product_list %}
-                            {% for product in product_list %}
+                        {% if products %}
+                            {% for product in products %}
                                 <div class="col-lg-4 col-md-6 col-sm-6">
                                     <div class="product__item sale">
                                         <div class="product__item__pic set-bg" data-setbg="{{product.product_image.url}}">
@@ -206,4 +224,4 @@
     <script type="text/javascript">
         var auth = "{{ request.user.is_authenticated }}";
     </script>
-{% endblock content %}
+{% endblock content %} -->

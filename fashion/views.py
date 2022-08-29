@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django import template
+from django.db.models import Min,Max
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseNotFound
 from django.template import loader
@@ -14,7 +16,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.hashers import make_password, check_password
 from .forms import RegisterForm, LoginForm, CustomerProfileForm
 from django.views import View
-from .models import Slider, Product,Catagory, Cart, FavouriteProduct, Customer, OrderPlaced
+from .models import Slider, Product,Catagory, Cart, FavouriteProduct, Customer, OrderPlaced, Variation, Size, Color, Brand
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import RedirectView,TemplateView
@@ -23,9 +25,10 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import stripe
 from django.views.generic import ListView
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import razorpay
 
 # Create your views here.
-
 class ProductView(View):
     def get(self, request):
         sliders = Slider.objects.all()
@@ -44,14 +47,35 @@ def shop(request):
     shipping_amount = 70.0
     totalamount = 0
     products = Product.objects.all()
+    productCount = Product.objects.count()
     catagories = Catagory.objects.all()
+    brands = Brand.objects.all()
+    minMaxPrice=Product.objects.aggregate(Min('original_price'),Max('original_price'))
+    order_by = request.GET.get('order_by', None)
+    
+    if order_by == 'highest':
+        products = Product.objects.order_by('-original_price')
+
+    else:
+        products = Product.objects.order_by('original_price')
+
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(products, 10)
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+
     cart_product = [p for p in Cart.objects.all() if p.user == request.user]
     if cart_product:
         for p in cart_product:
             tempamount = (p.quantity * p.product.discounted_price)
             amount += tempamount
         totalamount = amount+shipping_amount
-    return render(request, 'fashion/shop.html',{ 'products': products ,'catagories':catagories,'totalitem':totalitem,'totalamount':totalamount}) 
+    return render(request, 'fashion/shop.html',{ 'products': products ,'catagories':catagories,'totalitem':totalitem,'totalamount':totalamount,'brands':brands,'productCount':productCount,'minMaxPrice':minMaxPrice}) 
 
 def contact(request):
     return render(request, 'fashion/contact.html')
@@ -66,8 +90,10 @@ def add_to_cart(request):
     if item_already_in_cart1 == False:
         product_title = Product.objects.get(id=product)
         Cart(user=user, product=product_title).save()
+        messages.success(request, 'Product add to cart successfully!')
         return redirect('/cart')
     else:
+        messages.success(request, 'Product add to cart successfully!')
         return redirect('/cart')
 
 def cart(request):
@@ -102,7 +128,7 @@ def remove_cart(request):
         shipping_amount= 70.0
         cart_product = [p for p in Cart.objects.all() if p.user == request.user]
         for p in cart_product:
-            tempamount = (p.quantity * p.product.discounted_price)
+            tempamount = (p.quantity * p.product.original_price)
             amount += tempamount
         data = {
             'prod_id':prod_id,
@@ -201,12 +227,57 @@ def checkout(request):
             tempamount = (p.quantity * p.product.original_price)
             amount += tempamount
         totalamount = amount+shipping_amount
-    return render(request, 'fashion/checkout.html', {'add':add, 'cart_items':cart_items, 'totalcost':totalamount})
+        
+        response_payment = ''
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        response_payment = client.order.create(dict(amount=int(totalamount*100),
+                                                    currency='USD')
+                                               )
+        order_id = response_payment['id']
+        order_status = response_payment['status']
+        
+        if order_status == 'created':
+            order = OrderPlaced(
+                amount=totalamount,
+                order_id=order_id,
+                user_id=request.user.id,
+                product_id=p.product.id,
+                customer_id=p.product.customer.id,
+            )
+            order.save()
+            response_payment['email'] = request.user.email
+
+    return render(request, 'fashion/checkout.html', {'add':add, 'cart_items':cart_items, 'totalcost':totalamount,'payment':response_payment})
+
+@csrf_exempt
+def payment_status(request):
+    response = request.POST
+    print(response)
+    params_dict = {
+        'razorpay_order_id': response['razorpay_order_id'],
+        'razorpay_payment_id': response['razorpay_payment_id'],
+        'razorpay_signature': response['razorpay_signature']
+    }
+    # client instance
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+    try:
+        status = client.utility.verify_payment_signature(params_dict)
+        order = OrderPlaced.objects.get(order_id=response['razorpay_order_id'])
+        order.razorpay_payment_id = response['razorpay_payment_id']
+        order.has_paid = True
+        order.save()
+        return render(request, 'fashion/callback.html', {'status': True})
+    except:
+        return render(request, 'fashion/callback.html', {'status': False})
+
 
 class productDetails(View):
     def get(self, request, pk):
         totalitem = 0
         product = Product.objects.get(pk=pk)
+        size = Size.objects.all()
+        color = Color.objects.all()
         products = Product.objects.filter(category_id=product.category_id)
         product_in_favorites = None
         item_already_in_cart=False
@@ -223,7 +294,7 @@ class productDetails(View):
         if request.user.is_authenticated:
             totalitem = len(Cart.objects.filter(user=request.user))
             item_already_in_cart = Cart.objects.filter(Q(product=product.id) & Q(user=request.user)).exists()
-        return render(request, 'fashion/proDetails.html', {'product':product,'totalitem':totalitem,'product_in_favorites':product_in_favorites,'item_already_in_cart':item_already_in_cart,'products':products,'stripe_publishable_key':settings.STRIPE_PUBLISHABLE_KEY,'email':request.user.email})
+        return render(request, 'fashion/proDetails.html', {'product':product,'totalitem':totalitem,'product_in_favorites':product_in_favorites,'item_already_in_cart':item_already_in_cart,'products':products,'stripe_publishable_key':settings.STRIPE_PUBLISHABLE_KEY,'size':size,'color':color})
 
 class CustomerView(View):
     def get(self, request):
@@ -287,20 +358,111 @@ def login(request):
                 user = authenticate(username=request.POST.get("username"), password=request.POST.get("password"))
                 if user is not None:
                     auth_login(request, user)
+                    messages.success(request, 'You have successfully login!')
                     return redirect('home')
                 else:
                     messages.warning(request, 'Invalid credentials!')
             else:
                 messages.warning(request, 'Oops! something went wrong!')
         return render(request, "fashion/login.html", {"form": form})
-    return redirect("")
+    return redirect("login")
 
-class SearchView(ListView):
-    model = Product
-    template_name = 'fashion/search.html'
-    context_object_name = 'all_search_results'
+def search(request):
+    query = request.GET.get('search', '')
+    order_by = request.GET.get('order_by', None)
+    
+    if order_by == 'highest':
+        products=Product.objects.filter(Q(name__icontains=query)).order_by('-original_price')
+    else:
+        products=Product.objects.filter(Q(name__icontains=query)).order_by('original_price')
 
-    def get_queryset(self):
-        query = self.request.GET.get('search','')
-        products=Product.objects.filter(Q(name__icontains=query))
-        return products
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(products, 10)
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+
+    catagories = Catagory.objects.all()
+    params={'product_list':products,'catagories':catagories}
+    return render(request,'fashion/search.html',params)
+
+def product_cat(request,slug):
+    category = Catagory.objects.filter(slug=slug).first()
+    products = Product.objects.filter(category_id=category.id)
+    brands = Brand.objects.all()
+
+    order_by = request.GET.get('order_by', None)
+    
+    if order_by == 'highest':
+        products = Product.objects.filter(category_id=category.id).order_by('-original_price')
+    else:
+        products = Product.objects.filter(category_id=category.id).order_by('original_price')
+
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(products, 10)
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+
+    catagories = Catagory.objects.all()
+    template = loader.get_template('fashion/productCat.html')
+    context = {
+        'products': products,
+        'category': category,
+        'slug': slug,
+        'catagories': catagories,
+        'brands': brands,
+    }
+    return HttpResponse(template.render(context, request))
+
+def brand_cat(request,slug):
+    brand = Brand.objects.filter(slug=slug).first()
+    products = Product.objects.filter(brand_id=brand.id)
+
+    order_by = request.GET.get('order_by', None)
+    
+    if order_by == 'highest':
+        products = Product.objects.filter(brand_id=brand.id).order_by('-original_price')
+    else:
+        products = Product.objects.filter(brand_id=brand.id).order_by('original_price')
+
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(products, 10)
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+
+    catagories = Catagory.objects.all()
+    brands = Brand.objects.all()
+    template = loader.get_template('fashion/brandCat.html')
+    context = {
+        'products': products,
+        'brand': brand,
+        'brands': brands,
+        'slug': slug,
+        'catagories': catagories,
+    }
+    return HttpResponse(template.render(context, request))
+
+# Filter Data
+def filter_data(request):
+    minPrice=request.GET['minPrice']
+    maxPrice=request.GET['maxPrice']
+    allProducts=Product.objects.all().order_by('-id').distinct()
+    allProducts=allProducts.filter(original_price__gte=minPrice)
+    allProducts=allProducts.filter(original_price__lte=maxPrice)
+    print(allProducts)
+    t=render_to_string('fashion/product-list.html',{'data':allProducts})
+    return JsonResponse({'data':t})

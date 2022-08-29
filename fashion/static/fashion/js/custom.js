@@ -45,9 +45,11 @@ $('.remove-cart').click(function () {
                 prod_id: id
             },
             success: function (data) {
+                console.log(data);
                 $('.main-tr-'+data.prod_id).remove();
                 $('#amount').text('$ ' + data.amount);
                 $('#totalamount').text('$ ' + data.totalamount);
+                toastr.success('Product Remove Successfully!');
             }
         })
 });
@@ -94,16 +96,42 @@ $('body').on('click','.shop-add-to-fav',function (argument) {
     });
 })
 
-// $(document).ready(function () {
-//     var path = url;
-//     $('#search').typeahead({
-//             source: function (query, process) {
-//                 return $.get(path, {
-//                     query: query
-//                 }, function (data) {
-//                     console.log(data);
-//                     return process(data);
-//                 });
-//             }
-//         });
-// });
+$("body").on("change", ".low-to-high", function(){
+    $('.sort-form').submit();
+});
+
+$("body").on("change", ".search-filter", function(){
+    var val = $(this).val();
+    var url = window.location.href
+    window.location.href = url+"&order_by=" + val;
+});
+
+$("body").on("change", ".low-to-high-cat", function(){
+    $('.sort-search-form').submit();
+});
+
+$("body").on("change", ".low-to-high-brand", function(){
+    $('.sort-brand-search-form').submit();
+});
+
+$(document).ready(function (argument) {
+    $("#priceFilterBtn").on('click',function(){
+        var _filterObj={};
+        var _minPrice=$('#maxPrice').attr('min');
+        var _maxPrice=$('#maxPrice').val();
+        _filterObj.minPrice=_minPrice;
+        _filterObj.maxPrice=_maxPrice;
+
+        // Run Ajax
+        $.ajax({
+            url:'/filter-data',
+            data:_filterObj,
+            dataType:'json',
+            success:function(res){
+                console.log(res.data);
+                $("#filteredProducts").html(res.data);
+            }
+        });
+    });
+})
+$('.razorpay-payment-button').addClass('site-btn');

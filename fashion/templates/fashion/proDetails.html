@@ -55,53 +55,46 @@
                             <h3>${{ product.original_price }} <span>${{ product.discounted_price }}</span></h3>
                             <p>{{ product.desc|safe }}</p>
                             <div class="product__details__option">
-                                {% if product.category.name != 'Bags' %}
-                                    <div class="product__details__option__size">
-                                        <span>Size:</span>
-                                        <label for="xxl">xxl
-                                            <input type="radio" id="xxl">
-                                        </label>
-                                        <label class="active" for="xl">xl
-                                            <input type="radio" id="xl">
-                                        </label>
-                                        <label for="l">l
-                                            <input type="radio" id="l">
-                                        </label>
-                                        <label for="sm">s
-                                            <input type="radio" id="sm">
-                                        </label>
-                                    </div>
-                                {% endif %}
+                                <div class="product__details__option__size">
+                                    <span>Size:</span>
+                                    {% if size %}
+                                        {% for value in size %}
+                                            <label for="{{value.name}}">{{value.name}}
+                                                <input type="radio" id="{{value.name}}">
+                                            </label>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
                                 <div class="product__details__option__color">
                                     <span>Color:</span>
-                                    <label class="c-1" for="sp-1">
-                                        <input type="radio" id="sp-1">
-                                    </label>
-                                    <label class="c-2" for="sp-2">
-                                        <input type="radio" id="sp-2">
-                                    </label>
-                                    <label class="c-3" for="sp-3">
-                                        <input type="radio" id="sp-3">
-                                    </label>
-                                    <label class="c-4" for="sp-4">
-                                        <input type="radio" id="sp-4">
-                                    </label>
-                                    <label class="c-9" for="sp-9">
-                                        <input type="radio" id="sp-9">
-                                    </label>
+                                    {% if color %}
+                                        {% for value in color %}
+                                            {% if value.name == 'Red' %}
+                                                <label class="c-4" for="{{value.name}}">
+                                                    <input type="radio" id="{{value.name}}">
+                                                </label>
+                                            {% elif value.name == 'Yellow' %}
+                                                <label class="c-3" for="{{value.name}}">
+                                                    <input type="radio" id="{{value.name}}">
+                                                </label>
+                                            {% elif value.name == 'Blue' %}
+                                                <label class="c-2" for="{{value.name}}">
+                                                    <input type="radio" id="{{value.name}}">
+                                                </label>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="product__details__cart__option">
                                 {% if user.is_authenticated  %}
                                     {% if item_already_in_cart  %}
                                      <a href="{% url 'cart' %}" class="primary-btn add-to-cart">Go to Cart</a>
-                                     <a id="checkout-button" class="primary-btn buy-now">Buy Now</a>
                                     {% else %}
                                      <form action="{% url 'add-to-cart' %}" class="d-inline">
                                       <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
                                       <button type="submit" class="primary-btn add-to-cart">Add to Cart</button>
                                      </form>
-                                      <a id="checkout-button" class="primary-btn buy-now">Buy Now</a>
                                     {% endif %}
                                    {% endif %}
 
@@ -110,7 +103,6 @@
                                       <input type="hidden" name="prod_id" value="{{product.id}}" id="prod_id">
                                       <button type="submit" class="primary-btn add-to-cart">Add to Cart</button>
                                      </form>
-                                      <a id="checkout-button" class="primary-btnbuy-now">Buy Now</a>
                                    {% endif %}
                             </div>
                             <div class="product__details__btns__option">
