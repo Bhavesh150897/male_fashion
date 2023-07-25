@@ -1,5 +1,6 @@
 {% extends 'fashion/base.html' %}
 {% load static %}
+{% load django_browser_reload %}
 <!-- Hero Section Begin -->
 {% block content %}
 <!-- Breadcrumb Section Begin -->
@@ -27,58 +28,93 @@
             <div class="checkout__form">
                 <div class="row">
                     <div class="col-lg-8 col-md-6">
-                        <h6 class="checkout__title">Order Summary</h6>
-                        {% for item in cart_items %}
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    <h5>Product: {{item.product.name}}</h5>
-                                    <p>Quantity: {{item.quantity}}</p>
-                                    <p class="fw-bold">Price: {{item.total_cost}}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <p class="fw-bold">Total Cost + Rs. 70  = {{totalcost}}</p>
-                        <small>(Rs. 70 Delivery Charge)</small> <hr>
-                        <small>Term and Condition: Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia, ullam saepe! Iure optio repellat dolor velit, minus rem. Facilis cumque neque numquam laboriosam, accusantium adipisci nisi nihil in et quis?</small>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="checkout__order">
-                            <h4>Select Shipping Address</h4>
-                            <hr>
-                            {% for ad in add %}
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5>{{ad.first_name}}</h5>
-                                        <p>{{ad.address}}, {{ad.city}}, {{ad.state}}- {{ad.zipcode}}</p>
+                            <h6 class="checkout__title">Profile Details</h6>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Fist Name<span>*</span></p>
+                                        {{ form.first_name }}
+                                        <small class="text-danger">{{ form.errors.first_name|striptags }}</small>
                                     </div>
                                 </div>
-                                <div class="form-check mt-2 mb-5">
-                                    <input class="form-check-input" type="radio" name="custid" id="custadd{{forloop.counter}}" value="{{ad.id}}" checked>
-                                    <label class="form-check-label fw-bold" for="custadd{{forloop.counter}}">
-                                    Address: {{ forloop.counter }} </label>
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Last Name<span>*</span></p>
+                                        {{ form.last_name }}
+                                        <small class="text-danger">{{ form.errors.last_name|striptags }}</small>
+                                    </div>
                                 </div>
-                            {% endfor %}
-                            {% if payment %}
-                                <form action="{% url 'payment-status' %}" method="POST" class="payment-status">
-                                {% csrf_token %}
-                                    <script
-                                            src="https://checkout.razorpay.com/v1/checkout.js"
-                                            data-key="rzp_test_mWcxMOaFbrS2ux"
-                                            data-amount="{{ payment.amount }}"
-                                            data-order_id="{{ payment.id }}"
-                                            data-buttontext="PLACE ORDER"
-                                            data-name="Welcome to MaleFashion"
-                                            data-description="Total Payable"
-                                            data-image="{% static 'fashion/img/logo.png' %}"
-                                            data-prefill.name="{{ payment.name }}"
-                                            data-prefill.email="{{ payment.email }}"
-                                            data-theme.color="#111111"
-                                    ></script>
-                                    <input type="hidden" custom="Hidden Element" name="hidden">
-                                    <input type="hidden" custom="Hidden Element" name="cusid">
-                                    <input type="hidden" custom="Hidden Element" name="prod_id">
-                                </form>
-                            {% endif %}
+                            </div>
+                            <div class="checkout__input">
+                                <p>Country<span>*</span></p>
+                                {{ form.country }}
+                                <small class="text-danger">{{ form.errors.country|striptags }}</small>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Address<span>*</span></p>
+                                {{ form.address }}
+                                <small class="text-danger">{{ form.errors.address|striptags }}</small>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Town/City<span>*</span></p>
+                                {{ form.city }}
+                                <small class="text-danger">{{ form.errors.city|striptags }}</small>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Country/State<span>*</span></p>
+                                {{ form.state }}
+                                <small class="text-danger">{{ form.errors.state|striptags }}</small>
+                            </div>
+                            <div class="checkout__input">
+                                <p>Postcode / ZIP<span>*</span></p>
+                                {{ form.zipcode }}
+                                <small class="text-danger">{{ form.errors.zipcode|striptags }}</small>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Phone<span>*</span></p>
+                                        {{ form.phone }}
+                                        <small class="text-danger">{{ form.errors.phone|striptags }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="checkout__input">
+                                        <p>Email<span>*</span></p>
+                                        {{ form.email }}
+                                        <small class="text-danger">{{ form.errors.email|striptags }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkout__input">
+                                <div class="custom-control custom-checkbox">
+                                      <input {% if form.same_shipping_address.value %}checked{% endif %} type="checkbox" class="custom-control-input" id="same_shipping_address">
+
+                                      <label class="custom-control-label" for="same_shipping_address">Shipping address is the same as my billing address</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                      <input {% if form.save_info.value %}checked{% endif %} type="checkbox" class="custom-control-input" id="save-info">
+
+                                      <label class="custom-control-label" for="save-info">Save this information for next time</label>
+                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <button type="submit" class="site-btn">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    <hr class="mb-4">
+                    <div class="col-lg-4 col-md-6">
+                        <h4 class="mb-3">Payment</h4>
+
+                        <div class="d-block my-3">
+                            {% for value, name in form.fields.payment_option.choices %}
+                          <div class="custom-control custom-radio">
+                            <input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="custom-control-input"  required>
+                            <label class="custom-control-label" for="{{name}}">{{ name }}</label>
+                          </div>
+                          {% endfor %}
                         </div>
                     </div>
                 </div>

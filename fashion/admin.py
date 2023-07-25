@@ -33,6 +33,14 @@ class BrandAdmin(admin.ModelAdmin):
     model = Brand
     list_display = ['name','slug','created_at', ]
 
+class CustomerAdmin(admin.ModelAdmin):
+    model = Customer
+    list_display = ['user','first_name','last_name','country','address','city','zipcode','state','email','phone','created_at', ]
+
+class OrderPlacedAdmin(admin.ModelAdmin):
+    model = OrderPlaced
+    list_display = ['user','customer','product','quantity','ordered_date','status','amount','order_id','razorpay_payment_id','has_paid','created_at', ]
+    
 admin.site.register(Slider,SliderAdmin)
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Catagory,CatagoryAdmin)
@@ -40,3 +48,5 @@ admin.site.register(Brand,BrandAdmin)
 admin.site.register(Size,SizeAdmin)
 admin.site.register(Color,ColorAdmin)
 admin.site.register(Variation,VariationAdmin)
+admin.site.register(Customer,CustomerAdmin)
+admin.site.register(OrderPlaced,OrderPlacedAdmin)

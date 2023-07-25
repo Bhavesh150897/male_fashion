@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'adminlte3',
     'django_summernote',
     'adminlte3_theme',
+    'django_browser_reload'
 ]
 
 MIDDLEWARE = [
@@ -51,10 +52,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
+
 ]
 
 MIDDLEWARE_CLASSES = [
-    'fashion.middleware.AutoLogout', 
+    'fashion.middleware.AutoLogout',
 ]
 
 ROOT_URLCONF = 'malefashion.urls'
@@ -81,16 +84,16 @@ WSGI_APPLICATION = 'malefashion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {  
-    'default': {  
-        'ENGINE': 'django.db.backends.mysql',  
-        'NAME': 'malefashion',  
-        'USER':'root',  
-        'PASSWORD':'root',  
-        'HOST':'localhost',  
-        'PORT':'3306'  
-    }  
-}  
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'malefashion',
+        'USER':'root',
+        'PASSWORD':'root',
+        'HOST':'localhost',
+        'PORT':'3306'
+    }
+}
 
 
 # Password validation
@@ -168,8 +171,8 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 # Auto logout delay in minutes
 AUTO_LOGOUT_DELAY = 5 #equivalent to 5 minutes
 
-RAZORPAY_KEY_ID = 'rzp_test_mWcxMOaFbrS2ux'
-RAZORPAY_KEY_SECRET = 'wIe0uzjFBpK23F52MT79y0Sf'
+RAZORPAY_KEY_ID = 'rzp_test_PPqf3fqo3FzktS'
+RAZORPAY_KEY_SECRET = 'sFxQDceT130To1PDu6fjnwJV'
 
 # RAZORPAY_KEY_ID = "rzp_test_pw9gzzwaOSMUxs"
 # RAZORPAY_KEY_SECRET = "mD5BJXhjOyvkUaAgQg4IUL6D"

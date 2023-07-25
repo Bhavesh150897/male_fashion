@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             name='Product',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('label', models.CharField(choices=[('N', 'New'), ('BS', 'Best Seller'), ('S', 'Sale')], max_length=2)),
+                ('label', models.CharField(choices=[('N', 'New')], max_length=2)),
                 ('name', models.CharField(max_length=150)),
                 ('product_image', models.ImageField(blank=True, null=True, upload_to='productImages/')),
                 ('quantity', models.IntegerField()),
